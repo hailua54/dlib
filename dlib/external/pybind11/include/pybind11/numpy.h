@@ -25,6 +25,8 @@
 #include <typeindex>
 #include <utility>
 #include <vector>
+#include <iostream>
+using namespace std;
 
 /* This will be true on all flat address space platforms and allows us to reduce the
    whole npy_intp / ssize_t / Py_intptr_t business down to just ssize_t for all size
@@ -785,7 +787,13 @@ public:
 
     /// Byte size of a single element
     ssize_t itemsize() const {
-        return detail::array_descriptor_proxy(detail::array_proxy(m_ptr)->descr)->elsize;
+        // IMPORTANT VNOTE VDEBUG:  ===============================================================================
+        // auto cast from py::array_t<typename pixel_traits<pixel_type>::basic_pixel_type, py::array::c_style>& img
+        // to py::array& img ==> will lost img.itemsize() on window 11
+        // ========================================================================================================
+        ssize_t size = detail::array_descriptor_proxy(detail::array_proxy(m_ptr)->descr)->elsize;
+        if (size == 0) size = 1;
+        return size;
     }
 
     /// Total number of bytes
@@ -1064,7 +1072,10 @@ public:
                   (ExtraFlags & f_style) != 0 ? detail::f_strides(*shape, itemsize())
                                               : detail::c_strides(*shape, itemsize()),
                   ptr,
-                  base) {}
+                  base) 
+    {
+        //cout << "VDEBUG array_t constructor " << endl;
+    }
 
     explicit array_t(ssize_t count, const T *ptr = nullptr, handle base = handle())
         : array({count}, {}, ptr, base) {}

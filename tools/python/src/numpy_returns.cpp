@@ -4,6 +4,7 @@
 #include <dlib/image_transforms.h>
 #include <dlib/image_io.h>
 #include <pybind11/numpy.h>
+#include <iostream>
 
 using namespace dlib;
 using namespace std;
@@ -15,6 +16,25 @@ namespace py = pybind11;
 
 numpy_image<rgb_pixel> load_rgb_image (const std::string &path)
 {
+    /*
+    * using basic_pixel_type = typename pixel_traits<rgb_pixel>::basic_pixel_type;
+    * ===> basic_pixel_type === unsigned char
+    * 
+    * py::array::c_style
+    * 
+    * enum {
+        c_style = detail::npy_api::NPY_ARRAY_C_CONTIGUOUS_,
+        f_style = detail::npy_api::NPY_ARRAY_F_CONTIGUOUS_,
+        forcecast = detail::npy_api::NPY_ARRAY_FORCECAST_
+    };
+
+    NPY_ARRAY_C_CONTIGUOUS_ = 0x0001,
+
+    using basic_pixel_type = typename pixel_traits<rgb_pixel>::basic_pixel_type;
+    py::array_t<basic_pixel_type, py::array::c_style> data({ 1, 1, 3 });
+    cout << "VDEBUG data item size ===  " << data.itemsize() << endl;
+    */
+    
     numpy_image<rgb_pixel> img;
     load_image(img, path);
     return img; 
